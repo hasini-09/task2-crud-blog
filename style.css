@@ -1,0 +1,41 @@
+* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body { background: #f4f7f6; margin: 0; padding-bottom: 50px; }
+.navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem 10%; display: flex; justify-content: space-between; align-items: center; color: white; }
+.nav-links a { color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 5px; font-weight: bold; }
+.container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+/* Update this part in your style.css */
+.search-section form { 
+    display: flex; 
+    gap: 10px; 
+    width: 100%;
+    align-items: center; /* Keeps them perfectly aligned vertically */
+}
+
+.search-section input { 
+    flex: 1; /* This tells the input to take up all available space */
+    padding: 12px; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    min-width: 0; /* Prevents the input from pushing the button out */
+}
+
+.search-section button { 
+    padding: 12px 25px; /* Matched padding to the input height */
+    background: #764ba2; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer;
+    white-space: nowrap; /* Prevents the button text from wrapping */
+}
+.post-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+.post-meta { display: flex; justify-content: flex-end; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
+.actions a { text-decoration: none; margin-left: 20px; font-weight: bold; }
+.edit-btn { color: #764ba2; } .delete-btn { color: #e74c3c; }
+.form-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+.form-group { margin-bottom: 20px; }
+input[type="text"], textarea { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; }
+.btn-submit { width: 100%; padding: 14px; background: #764ba2; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.pagination { display: flex; justify-content: center; gap: 8px; margin-top: 40px; }
+.pagination a { padding: 10px 16px; background: white; color: #764ba2; text-decoration: none; border: 1px solid #ddd; border-radius: 6px; }
+.pagination a.active { background: #764ba2; color: white; }

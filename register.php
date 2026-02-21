@@ -1,4 +1,12 @@
 <?php
+// 1. Enable error reporting so you can see why the page is blank
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// 2. Start the session BEFORE any HTML or whitespace
+session_start();
+
 include "db.php";
 $message = "";
 
@@ -15,12 +23,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = "<span style='color: #e74c3c;'>Password must be 8+ chars with uppercase, number, and special char.</span>";
     } else {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (username, password) VALUES ('$username', '$hashedPassword')";
-
-        if ($conn->query($sql) === TRUE) {
-            $message = "<span style='color: #2ecc71;'>Registration successful!</span>";
+        
+        // Use Prepared Statements for security and to avoid syntax errors
+        $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+        
+        if ($stmt) {
+            $stmt->bind_param("ss", $username, $hashedPassword);
+            if ($stmt->execute()) {
+                $_SESSION["user"] = $username;
+                header("Location: index.php");
+                exit();
+            } else {
+                $message = "<span style='color: #e74c3c;'>Error: Username may already exist.</span>";
+            }
+            $stmt->close();
         } else {
-            $message = "<span style='color: #e74c3c;'>Error: " . $conn->error . "</span>";
+            $message = "<span style='color: #e74c3c;'>Database error: " . $conn->error . "</span>";
         }
     }
 }
@@ -34,7 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Join Us | Register</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
@@ -43,7 +60,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             align-items: center;
             margin: 0;
         }
-
         .container {
             background: white;
             padding: 2rem;
@@ -53,11 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             max-width: 400px;
             text-align: center;
         }
-
         h2 { color: #333; margin-bottom: 1.5rem; }
         .form-group { text-align: left; margin-bottom: 1rem; position: relative; }
         label { display: block; margin-bottom: 5px; color: #666; font-weight: 600; }
-
         input[type="text"], input[type="password"] {
             width: 100%;
             padding: 12px;
@@ -65,10 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 8px;
             transition: border-color 0.3s;
         }
-
         input:focus { border-color: #764ba2; outline: none; }
-
-        /* Style for the Hide/Unhide button */
         .toggle-btn {
             position: absolute;
             right: 10px;
@@ -81,7 +92,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-weight: bold;
             padding: 5px;
         }
-
         button.submit-btn {
             width: 100%;
             padding: 12px;
@@ -95,7 +105,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             transition: background 0.3s;
             margin-top: 10px;
         }
-
         button.submit-btn:hover { background: #5a3782; }
         .message { margin-top: 1rem; font-weight: bold; font-size: 0.85rem; }
         .footer-link { margin-top: 1.5rem; font-size: 0.9rem; }
@@ -108,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="container">
     <h2>Create Account</h2>
 
-    <form method="POST">
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
         <div class="form-group">
             <label>Username</label>
             <input type="text" name="username" placeholder="Enter username" required>
@@ -118,7 +127,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label>Password</label>
             <input type="password" name="password" id="passwordField"
                    placeholder="Enter password" 
-                   pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&]).{8,}" 
                    required>
             <button type="button" class="toggle-btn" onclick="togglePassword()">SHOW</button>
             <span class="hint">Min. 8 chars, 1 Uppercase, 1 Number, 1 Special Symbol</span>
@@ -138,7 +146,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function togglePassword() {
         const passwordField = document.getElementById('passwordField');
         const toggleBtn = document.querySelector('.toggle-btn');
-        
         if (passwordField.type === 'password') {
             passwordField.type = 'text';
             toggleBtn.textContent = 'HIDE';
